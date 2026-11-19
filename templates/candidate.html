@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ candidate.filename }} | Candidate Analysis</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6fa;
+    color: #172033;
+    line-height: 1.6;
+}
+
+.container {
+    width: min(1250px, 100%);
+    margin: auto;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    display: inline-block;
+    padding: 10px 16px;
+    background: #111827;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+.back-button:hover {
+    background: #273142;
+}
+
+.header,
+.section {
+    background: white;
+    border: 1px solid #e1e5eb;
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.header {
+    padding: 28px;
+}
+
+.header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.filename {
+    color: #687386;
+    font-size: 14px;
+}
+
+.rank-score {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.stat-card {
+    background: #f8fafc;
+    border: 1px solid #e3e7ed;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.stat-card span {
+    display: block;
+    color: #687386;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.stat-card strong {
+    font-size: 28px;
+}
+
+.recommendation {
+    display: inline-block;
+    padding: 8px 13px;
+    border-radius: 8px;
+    background: #eef1f5;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.section h2 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 21px;
+}
+
+.section-description {
+    color: #687386;
+    margin-top: -8px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.score-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.score-item {
+    border: 1px solid #e2e6ed;
+    border-radius: 11px;
+    padding: 16px;
+}
+
+.score-item-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.score-item-header strong {
+    font-size: 14px;
+}
+
+.score-value {
+    font-weight: 700;
+}
+
+.progress {
+    height: 9px;
+    background: #edf0f4;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0;
+    background: #111827;
+    border-radius: 20px;
+    transition: width 0.4s ease;
+}
+
+.contribution {
+    color: #687386;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.two-column {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.list-box {
+    border: 1px solid #e2e6ed;
+    border-radius: 12px;
+    padding: 18px;
+}
+
+.list-box h3 {
+    margin-top: 0;
+    font-size: 16px;
+}
+
+ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 7px;
+    line-height: 1.5;
+}
+
+.strengths {
+    border-left: 5px solid #222;
+}
+
+.gaps {
+    border-left: 5px solid #777;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #edf0f4;
+    font-size: 13px;
+    vertical-align: top;
+}
+
+th {
+    background: #f8fafc;
+    font-weight: 700;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.supported,
+.not-demonstrated {
+    display: inline-block;
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: #eef1f5;
+    font-weight: 700;
+}
+
+.not-demonstrated {
+    background: #f1f1f1;
+}
+
+.requirement-required {
+    font-weight: 700;
+}
+
+.requirement-preferred {
+    color: #687386;
+}
+
+.evidence-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.evidence-card {
+    border: 1px solid #e2e6ed;
+    border-radius: 12px;
+    padding: 18px;
+    background: #fafbfc;
+}
+
+.evidence-card span,
+.project-card span,
+.final-result-card span {
+    display: block;
+    color: #687386;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.evidence-card strong {
+    font-size: 24px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.tag-container,
+.skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag,
+.skill-tag {
+    display: inline-block;
+    padding: 7px 10px;
+    background: #f1f3f6;
+    border: 1px solid #e1e5ea;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.project-score {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.project-card {
+    border: 1px solid #e2e6ed;
+    border-radius: 12px;
+    padding: 18px;
+}
+
+.project-card strong {
+    font-size: 22px;
+}
+
+.ai-review-box {
+    background: #f8fafc;
+    border: 1px solid #dfe4eb;
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.ai-review-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.ai-review-title h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.ai-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 7px;
+    background: #111827;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.ai-review-content {
+    font-size: 15px;
+    color: #334155;
+    line-height: 1.8;
+}
+
+.ai-review-content p {
+    margin: 0 0 12px;
+}
+
+.gemini-text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.final-result {
+    background: #f8fafc;
+    border: 1px solid #e2e6ed;
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.final-result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-top: 18px;
+}
+
+.final-result-card {
+    border: 1px solid #e2e6ed;
+    border-radius: 10px;
+    padding: 16px;
+    background: white;
+}
+
+.final-result-card strong {
+    font-size: 20px;
+    overflow-wrap: anywhere;
+}
+
+.ai-decision-box {
+    background: white;
+    border: 2px solid #111827;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 18px;
+}
+
+.ai-decision-label {
+    color: #687386;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.ai-decision-text {
+    font-size: 25px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.reason-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.reason-box {
+    border: 1px solid #e2e6ed;
+    border-radius: 12px;
+    padding: 20px;
+    background: white;
+}
+
+.reason-box h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 17px;
+}
+
+.reason-box p {
+    margin: 0;
+    color: #334155;
+    line-height: 1.8;
+}
+
+.matched-skills-box {
+    margin-top: 18px;
+    border: 1px solid #e2e6ed;
+    border-radius: 12px;
+    padding: 20px;
+    background: white;
+}
+
+.matched-skills-box h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.skill-tag {
+    padding: 7px 11px;
+}
+
+.decision-note {
+    margin-top: 18px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f1f3f6;
+    color: #4b5563;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.footer-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.button {
+    display: inline-block;
+    padding: 11px 17px;
+    background: #111827;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+}
+
+.button.secondary {
+    background: #eef1f5;
+    color: #172033;
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+
+.small-text {
+    color: #687386;
+    font-size: 12px;
+}
+
+@media (max-width: 850px) {
+    body {
+        padding: 15px;
+    }
+
+    .rank-score,
+    .score-grid,
+    .two-column,
+    .evidence-summary,
+    .project-score,
+    .final-result-grid,
+    .reason-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .top-bar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .ai-review-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="top-bar">
+    <a href="/" class="back-button">← Screen New Resumes</a>
+    <a href="/ranking" class="back-button">Back to Ranking</a>
+</div>
+
+<section class="header">
+    <h1>Candidate Analysis</h1>
+    <div class="filename">
+        Resume: <strong>{{ candidate.filename }}</strong>
+    </div>
+
+    <div class="rank-score">
+        <div class="stat-card">
+            <span>Candidate Rank</span>
+            <strong>#{{ candidate.rank }}</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Overall Score</span>
+            <strong>{{ candidate.overall_score }}%</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Recommendation</span>
+            <strong>
+                <span class="recommendation">{{ candidate.recommendation }}</span>
+            </strong>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Score Breakdown</h2>
+    <p class="section-description">
+        The overall score combines technical skills, specialized skills,
+        preferred skills, soft skills, education and project relevance.
+    </p>
+
+    <div class="score-grid">
+        {% for label, score, weight, contribution in [
+            ("Technical Skills", candidate.technical_score, 35, candidate.technical_contribution),
+            ("Specialized Skills", candidate.specialized_score, 25, candidate.specialized_contribution),
+            ("Preferred Skills", candidate.preferred_score, 10, candidate.preferred_contribution),
+            ("Soft Skills", candidate.soft_skill_score, 5, candidate.soft_skill_contribution),
+            ("Education", candidate.education_score, 15, candidate.education_contribution),
+            ("Project Relevance", candidate.project_score, 10, candidate.project_contribution)
+        ] %}
+        <div class="score-item">
+            <div class="score-item-header">
+                <strong>{{ label }}</strong>
+                <span class="score-value">{{ score }}%</span>
+            </div>
+
+            <div class="progress">
+                <div class="progress-bar" data-width="{{ score | default(0, true) }}"></div>
+            </div>
+
+            <div class="contribution">
+                Weight: {{ weight }}% | Contribution: {{ contribution }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section">
+    <h2>Evidence-Based Requirement Verification</h2>
+    <p class="section-description">
+        The system checks whether required and preferred skills are supported
+        by evidence in the resume.
+    </p>
+
+    <div class="evidence-summary">
+        <div class="evidence-card">
+            <span>Overall Evidence Score</span>
+            <strong>{{ candidate.evidence_score }}%</strong>
+        </div>
+
+        <div class="evidence-card">
+            <span>Required Evidence</span>
+            <strong>{{ candidate.required_evidence_score }}%</strong>
+        </div>
+
+        <div class="evidence-card">
+            <span>Preferred Evidence</span>
+            <strong>{{ candidate.preferred_evidence_score }}%</strong>
+        </div>
+    </div>
+
+    {% if evidence_summary %}
+    <div class="list-box">
+        <h3>Evidence Summary</h3>
+        <p class="small-text">{{ evidence_summary }}</p>
+    </div>
+    <br>
+    {% endif %}
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Requirement</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Evidence Strength</th>
+                    <th>Evidence Score</th>
+                    <th>Resume Source</th>
+                </tr>
+            </thead>
+            <tbody>{{ evidence_rows | safe }}</tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Strengths and Gaps</h2>
+
+    <div class="two-column">
+        <div class="list-box strengths">
+            <h3>Candidate Strengths</h3>
+            <ul>{{ strengths_html | safe }}</ul>
+        </div>
+
+        <div class="list-box gaps">
+            <h3>Identified Gaps</h3>
+            <ul>{{ gaps_html | safe }}</ul>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Core Technical Skills</h2>
+
+    <div class="two-column">
+        <div class="list-box">
+            <h3>Matched Skills</h3>
+            <ul>{{ technical_matched_html | safe }}</ul>
+        </div>
+
+        <div class="list-box">
+            <h3>Missing Skills</h3>
+            <ul>{{ technical_missing_html | safe }}</ul>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Specialized Skills</h2>
+
+    <div class="list-box">
+        <h3>Skills Identified</h3>
+        <div class="tag-container">
+            {% for skill in candidate.specialized_skills %}
+            <span class="tag">{{ skill | title }}</span>
+            {% else %}
+            <span class="small-text">No specialized skills identified.</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <br>
+
+    <div class="two-column">
+        <div class="list-box">
+            <h3>Matched Specialized Skills</h3>
+            <ul>{{ specialized_matched_html | safe }}</ul>
+        </div>
+
+        <div class="list-box">
+            <h3>Missing Specialized Skills</h3>
+            <ul>{{ specialized_missing_html | safe }}</ul>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Preferred Skills</h2>
+
+    <div class="two-column">
+        <div class="list-box">
+            <h3>Matched Preferred Skills</h3>
+            <ul>{{ preferred_matched_html | safe }}</ul>
+        </div>
+
+        <div class="list-box">
+            <h3>Missing Preferred Skills</h3>
+            <ul>{{ preferred_missing_html | safe }}</ul>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Soft Skills</h2>
+
+    <div class="two-column">
+        <div class="list-box">
+            <h3>Matched Soft Skills</h3>
+            <ul>{{ soft_matched_html | safe }}</ul>
+        </div>
+
+        <div class="list-box">
+            <h3>Missing Soft Skills</h3>
+            <ul>{{ soft_missing_html | safe }}</ul>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Education Analysis</h2>
+
+    <div class="list-box">
+        <h3>Candidate Education</h3>
+        <ul>
+            {% if candidate.resume_education %}
+                {% for key, value in candidate.resume_education.items() %}
+                <li>
+                    <strong>{{ key | replace("_", " ") | title }}:</strong>
+                    {{ value }}
+                </li>
+                {% endfor %}
+            {% else %}
+                <li>No structured education information detected.</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <br>
+
+    <div class="list-box">
+        <h3>Education Verification</h3>
+        <ul>{{ education_checks_html | safe }}</ul>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Project Relevance</h2>
+    <p class="section-description">
+        Project relevance evaluates whether the candidate has demonstrated
+        required or preferred skills through projects and practical work.
+    </p>
+
+    <div class="project-score">
+        <div class="project-card">
+            <span>Project Score</span>
+            <strong>{{ candidate.project_score }}%</strong>
+        </div>
+
+        <div class="project-card">
+            <span>Relevance</span>
+            <strong>{{ candidate.project_relevance }}</strong>
+        </div>
+
+        <div class="project-card">
+            <span>Similarity</span>
+            <strong>{{ candidate.similarity_score }}%</strong>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Project Metric</th>
+                    <th>Evidence</th>
+                    <th>Score / Value</th>
+                </tr>
+            </thead>
+            <tbody>{{ project_rows | safe }}</tbody>
+        </table>
+    </div>
+
+    <br>
+
+    <div class="list-box">
+        <h3>Project Evidence</h3>
+        <ul>{{ project_evidence_html | safe }}</ul>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Skill Proficiency</h2>
+    <p class="section-description">
+        The system attempts to identify the level of proficiency demonstrated
+        for skills found in the candidate's resume.
+    </p>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Skill</th>
+                    <th>Detected Proficiency</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if proficiency_rows %}
+                    {{ proficiency_rows | safe }}
+                {% else %}
+                    <tr>
+                        <td colspan="2">No proficiency information available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <h2>AI Candidate Review</h2>
+    <p class="section-description">
+        This review summarizes the candidate's resume, skills, education,
+        projects, evidence and screening results.
+    </p>
+
+    <div class="ai-review-box">
+        <div class="ai-review-title">
+            <h3>Candidate-Specific Screening Review</h3>
+            <span class="ai-badge">AI GENERATED</span>
+        </div>
+
+        <div class="ai-review-content">
+            {% if ai_review %}
+                {{ ai_review | safe }}
+            {% else %}
+                <p>Candidate-specific AI review is not available.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Gemini Resume Analysis</h2>
+    <p class="section-description">
+        Gemini provides optional analysis of the resume against the job description.
+        Screening scores and candidate rankings are calculated separately.
+    </p>
+
+    <div class="ai-review-box">
+        <div class="ai-review-title">
+            <h3>Gemini-Powered Analysis</h3>
+            <span class="ai-badge">GEMINI AI</span>
+        </div>
+
+        {% if gemini_status != "success" %}
+        <form method="POST" action="{{ url_for('run_candidate_gemini', rank=candidate.rank) }}" id="gemini-analysis-form" style="margin-bottom: 18px;">
+            <button type="submit" class="button" id="gemini-analysis-button">
+                Generate Gemini AI Analysis
+            </button>
+            <p class="small-text" id="gemini-loading-message" hidden>
+                Gemini is analyzing this resume. Please wait.
+            </p>
+        </form>
+        {% endif %}
+
+        <div class="ai-review-content gemini-text">
+            {% if gemini_status == "success" and gemini_analysis %}
+                {{ gemini_analysis }}
+                {% if gemini_model %}
+                <p class="small-text">Model: {{ gemini_model }}</p>
+                {% endif %}
+            {% elif gemini_status == "not_requested" %}
+                <p>Click the button above to generate an optional Gemini review for this candidate.</p>
+            {% elif gemini_error %}
+                <p>Gemini analysis could not be generated. You can try again.</p>
+                <p class="small-text">{{ gemini_error }}</p>
+            {% else %}
+                <p>Gemini analysis has not been generated yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Final AI Screening Decision</h2>
+
+    <div class="ai-decision-box">
+        <div class="ai-decision-label">AI SCREENING DECISION</div>
+        <p class="ai-decision-text">{{ final_decision }}</p>
+    </div>
+
+    <div class="reason-grid" style="grid-template-columns: 1fr;">
+        <div class="reason-box">
+            <h3>Final Review</h3>
+
+            {% set decision = final_decision | default('', true) | lower | trim %}
+
+            <p>
+                {% if 'not selected' in decision
+                    or 'not suitable' in decision
+                    or 'rejected' in decision
+                    or 'not recommended' in decision %}
+                    {{ not_selection_reason | default(
+                        'The candidate does not meet enough of the screening requirements for this role.',
+                        true
+                    ) }}
+                {% else %}
+                    {{ selection_reason | default(
+                        'The candidate meets the screening criteria based on the resume information analyzed.',
+                        true
+                    ) }}
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="matched-skills-box">
+        <h3>Skills Considered in the AI Decision</h3>
+
+        <div class="skill-tags">
+            {% for skill in candidate.ai_matched_skills %}
+            <span class="skill-tag">
+                {{ skill | replace("_", " ") | title }}
+            </span>
+            {% else %}
+            <span class="small-text">No matched skills identified.</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="matched-skills-box">
+        <h3>Missing or Insufficiently Demonstrated Skills</h3>
+
+        <div class="skill-tags">
+            {% for skill in candidate.ai_missing_skills %}
+            <span class="skill-tag">
+                {{ skill | replace("_", " ") | title }}
+            </span>
+            {% else %}
+            <span class="small-text">
+                No significant missing skills identified.
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="decision-note">
+        The AI screening decision is a recommendation based on the information
+        detected in the resume and the configured screening criteria. It
+        should support, not replace, human review.
+    </div>
+</section>
+
+<section class="section">
+    <h2>Final AI Screening Summary</h2>
+
+    <div class="final-result">
+        <p class="section-description">
+            This summary represents the automated screening result generated
+            from the candidate's resume analysis.
+        </p>
+
+        <div class="final-result-grid">
+            <div class="final-result-card">
+                <span>Overall Score</span>
+                <strong>{{ candidate.overall_score }}%</strong>
+            </div>
+
+            <div class="final-result-card">
+                <span>AI Decision</span>
+                <strong>{{ final_decision }}</strong>
+            </div>
+
+            <div class="final-result-card">
+                <span>Recommendation</span>
+                <strong>{{ candidate.recommendation }}</strong>
+            </div>
+
+            <div class="final-result-card">
+                <span>Candidate Rank</span>
+                <strong>#{{ candidate.rank }}</strong>
+            </div>
+
+            <div class="final-result-card">
+                <span>Evidence Score</span>
+                <strong>{{ candidate.evidence_score }}%</strong>
+            </div>
+
+            <div class="final-result-card">
+                <span>Project Relevance</span>
+                <strong>{{ candidate.project_relevance }}</strong>
+            </div>
+
+            <div class="final-result-card">
+                <span>Resume Similarity</span>
+                <strong>{{ candidate.similarity_score }}%</strong>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="footer-actions">
+        <a href="/" class="button">Screen New Resumes</a>
+        <a href="/ranking" class="button secondary">Back to Ranking</a>
+    </div>
+</section>
+
+</div>
+
+<script>
+document.querySelectorAll(".progress-bar[data-width]").forEach(function (bar) {
+    const rawWidth = parseFloat(bar.getAttribute("data-width")) || 0;
+    const safeWidth = Math.max(0, Math.min(100, rawWidth));
+    bar.style.width = safeWidth + "%";
+});
+</script>
+
+<script>
+const geminiForm = document.getElementById("gemini-analysis-form");
+if (geminiForm) {
+    geminiForm.addEventListener("submit", function () {
+        const button = document.getElementById("gemini-analysis-button");
+        const loadingMessage = document.getElementById("gemini-loading-message");
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Generating Gemini Analysis...";
+        }
+        if (loadingMessage) {
+            loadingMessage.hidden = false;
+        }
+    });
+}
+</script>
+
+</body>
+</html>
